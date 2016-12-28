@@ -1,0 +1,17 @@
+<config (account, uaserver, rtpaudio, regproxy, log, audio)>
+  <account>
+    <account username="luigi@emilio.com" #REQUIRED>
+    <account passwd= "crack" #REQUIRED>
+  <uaserver>
+    <uaserver ip="" #IMPLIED>
+    <uaserver puerto="4000" #REQUIRED>
+  <rtpaudio>
+    <rtpaudio puerto="6000" #REQUIRED>
+  <regproxy>
+    <regproxy ip="127.0.0.1" #REQUIRED>
+    <regproxy puerto="5000" #REQUIRED>
+  <log>
+    <log path="loguac1.txt" #REQUIRED>
+  <audio>
+  <audio path="cancion.mp3" #REQUIRED>
+</config>
