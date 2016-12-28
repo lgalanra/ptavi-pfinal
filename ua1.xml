@@ -1,11 +1,11 @@
 <config>
   <account username="luigi@emilio.com" passwd= "crack">
   </account>
-  <uaserver ip="" puerto="4000">
+  <uaserver ip="" port="4000">
   </uaserver>
-  <rtpaudio puerto="6000">
+  <rtpaudio port="6000">
   </rtpaudio>
-  <regproxy ip="127.0.0.1" puerto="5000">
+  <regproxy ip="127.0.0.1" port="5000">
   </regproxy>
   <log path="loguac1.txt">
   </log>
