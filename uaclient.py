@@ -21,8 +21,14 @@ if __name__ == "__main__":
 
     tree = ET.parse(CONFIG)
     root = tree.getroot()
-    print(root)
-    print(tree)
+
+    USER = root.find('account').attrib['username']
+    PASSWD = root.find('account').attrib['passwd']
+    PORT = root.find('uaserver').attrib['port']
+    RTPPORT = root.find('rtpaudio').attrib['port']
+    PROXYPORT = root.find('regproxy').attrib['port']
+
+    print(USER, PASSWD, PORT, RTPPORT, PROXYPORT)
 
 '''
     INIT = METHOD + ' sip:' + LOGIN + '@' + IP + ' SIP/2.0\r\n\r\n'
