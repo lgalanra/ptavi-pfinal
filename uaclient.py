@@ -6,19 +6,25 @@ Programa cliente SIP que abre un socket a un servidor
 
 import socket
 import sys
+import xml.etree.ElementTree as ET
 
 
 if __name__ == "__main__":
-    # Constantes. Dirección IP del servidor y contenido a enviar
     try:
-        METHOD = sys.argv[1]
-        destination = str(sys.argv[2])
-        LOGIN = destination[:destination.find('@')]
-        IP = destination[destination.find('@') + 1: destination.find(':')]
-        PORT = int(destination[destination.find(':') + 1:])
+        CONFIG = str(sys.argv[1])
+        METHOD = str(sys.argv[2])
+        OPTION = str(sys.argv[3])
     except ValueError:
-        sys.exit("Usage: client.py method receiver@IP:SIPport")
+        sys.exit("Usage: python uaclient.py config method option")
 
+    #TEMA PORT
+
+    tree = ET.parse(CONFIG)
+    root = tree.getroot()
+    print(root)
+    print(tree)
+
+'''
     INIT = METHOD + ' sip:' + LOGIN + '@' + IP + ' SIP/2.0\r\n\r\n'
     ACK = 'ACK sip:' + LOGIN + '@' + IP + ' SIP/2.0\r\n\r\n'
     BYE = 'BYE sip:' + LOGIN + '@' + IP + ' SIP/2.0\r\n\r\n'
@@ -45,3 +51,4 @@ if __name__ == "__main__":
             text = my_socket.recv(1024)
 
     print("Socket terminado.")
+'''
