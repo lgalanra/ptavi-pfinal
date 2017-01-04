@@ -44,12 +44,19 @@ if __name__ == "__main__":
         tree = ET.parse(CONFIG)
         root = tree.getroot()
         IP = root.find('uaserver').attrib['ip']
+        if IP == '':
+            IP = '127.0.0.1'
+        else:
+            IP = IP
         PORT = root.find('uaserver').attrib['port']
-        RTPPORT = root.find('rtpaudio').attrib['port']  
+        RTPPORT = root.find('rtpaudio').attrib['port']
+
     except ValueError:
         print("Usage: python uaserver.py config")
     serv = socketserver.UDPServer(('', int(PORT)), SIPHandler)
     print("Listening...")
+
+    print(IP,PORT,RTPPORT)
     try:
         serv.serve_forever()
     except KeyboardInterrupt:
