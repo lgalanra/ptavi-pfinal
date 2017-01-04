@@ -7,6 +7,7 @@ Clase (y programa principal) para un servidor SIP peer2peer
 import socketserver
 import sys
 import os
+import xml.etree.ElementTree as ET
 
 
 class SIPHandler(socketserver.DatagramRequestHandler):
@@ -22,7 +23,7 @@ class SIPHandler(socketserver.DatagramRequestHandler):
         text = self.rfile.read()
         info = text.decode('utf-8')
         print('Recibimos -> ' + info)
-
+'''
         if info.startswith('INVITE'):
             self.wfile.write(
                 b'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
@@ -36,15 +37,18 @@ class SIPHandler(socketserver.DatagramRequestHandler):
             self.wfile.write(b'SIP/2.0 200 OK\r\n\r\n')
         else:
             self.wfile.write(b'SIP/2.0 405 Method not Allowed\r\n\r\n')
-
+'''
 if __name__ == "__main__":
     try:
-        IP = sys.argv[1]
-        PORT = int(sys.argv[2])
-        fichero_audio = str(sys.argv[3])
+        CONFIG = sys.argv[1]
+        tree = ET.parse(CONFIG)
+        root = tree.getroot()
+        IP = root.find('uaserver').attrib['ip']
+        PORT = root.find('uaserver').attrib['port']
+        RTPPORT = root.find('rtpaudio').attrib['port']  
     except ValueError:
-        print("Usage: python server.py IP port audio_file")
-    serv = socketserver.UDPServer(('', PORT), SIPHandler)
+        print("Usage: python uaserver.py config")
+    serv = socketserver.UDPServer(('', int(PORT)), SIPHandler)
     print("Listening...")
     try:
         serv.serve_forever()
