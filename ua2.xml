@@ -1,0 +1,14 @@
+<config>
+  <account username="talfi@emilio.com" passwd="choe">
+  </account>
+  <uaserver ip='' port='5000'>
+  </uaserver>
+  <rtpaudio port='9999'>
+  </rtpaudio>
+  <regproxy ip='127.0.0.1' port='5000'>
+  </regproxy>
+  <log path='loguac2.txt'>
+  </log>
+  <audio path='cancion.mp3'>
+  </audio>
+</config>
