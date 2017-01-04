@@ -8,6 +8,7 @@ import socketserver
 import sys
 import json
 import time
+import xml.etree.ElementTree as ET
 
 
 class SIPRegisterHandler(socketserver.DatagramRequestHandler):
@@ -76,11 +77,23 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
 if __name__ == "__main__":
     try:
-        PORT = int(sys.argv[1])
-    except PortError:
-        print("Introducir puerto escucha del servidor")
-    serv = socketserver.UDPServer(('', PORT), SIPRegisterHandler)
-    print("Lanzando servidor UDP de eco...")
+        CONFIG = sys.argv[1]
+        tree = ET.parse(CONFIG)
+        root = tree.getroot()
+        NAME = root.find('server').attrib['name']
+        IP = root.find('server').attrib['ip']
+        if IP == '':
+            IP = '127.0.0.1'
+        else:
+            IP = IP
+        PORT = root.find('server').attrib['port']
+        REGUSERS = root.find('database').attrib['path']
+        PASSWDS = root.find('database').attrib['passwdpath']
+        LOG = root.find('log').attrib['path']
+    except ValueError:
+        print("Usage: python proxy_registrar.py config")
+    serv = socketserver.UDPServer(('', int(PORT)), SIPRegisterHandler)
+    print('Server ' + NAME + ' listening at port ' + PORT + '...')
     try:
         serv.serve_forever()
     except KeyboardInterrupt:
