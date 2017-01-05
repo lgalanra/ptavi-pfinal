@@ -24,6 +24,13 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         """
         Método principal para manejar mensajes cliente servidor
         """
+
+        text = self.rfile.read()
+        info = text.decode('utf-8')
+        print('Recibimos -> ' + info)
+        self.wfile.write(b'Recibido!')
+
+'''
         if self.lists == []:
             self.json2registered()
 
@@ -74,7 +81,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             self.lists = json.load(open("registered.json", 'r'))
         except:
             pass
-
+'''
 if __name__ == "__main__":
     try:
         CONFIG = sys.argv[1]
