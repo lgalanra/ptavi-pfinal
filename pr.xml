@@ -1,5 +1,5 @@
 <config>
-  <server name='CoolServer' ip='' port='8888'>
+  <server name='CoolServer' ip='' port='5000'>
   </server>
   <database path='usuarios.json' passwdpath='passwords.txt'>
   </database>
