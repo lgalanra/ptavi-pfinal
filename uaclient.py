@@ -24,11 +24,14 @@ if __name__ == "__main__":
 
     USER = root.find('account').attrib['username']
     PASSWD = root.find('account').attrib['passwd']
+    IP = root.find('uaserver').attrib['ip']
+    if IP == '':
+        IP = '127.0.0.1'
+    else:
+        IP = IP
     PORT = root.find('uaserver').attrib['port']
     RTPPORT = root.find('rtpaudio').attrib['port']
     PROXYPORT = root.find('regproxy').attrib['port']
-
-    print(USER, PASSWD, PORT, RTPPORT, PROXYPORT)
 
     if METHOD == 'REGISTER':
         receiver = root.find('regproxy').attrib['ip']
@@ -41,8 +44,17 @@ if __name__ == "__main__":
         sys.exit('Usage: python uaclient.py config method option')
 
     REGLINE = 'REGISTER sip:' + USER + ':' + PORT + ' SIP/2.0\r\nExpi\
-                res: ' + expires + '\r\n'
+res: ' + expires + '\r\n'
 
+    INVLINE = 'INVITE sip:' + receiver + ' SIP/2.0\r\nContent-Type: applicat\
+ion/sdp\r\n\r\nv=0\r\no=' + USER + ' ' + IP + '\r\ns=my\
+session\r\nt=0\r\nm=audio ' + RTPPORT + ' RTP\r\n'
+
+    ACKLINE = 'ACK sip:' + receiver + ' SIP/2.0\r\n'
+
+    BYELINE = 'BYE sip:' + receiver + ' SIP/2.0\r\n'
+
+print(REGLINE,INVLINE,ACKLINE,BYELINE)
 
 '''
     INIT = METHOD + ' sip:' + LOGIN + '@' + IP + ' SIP/2.0\r\n\r\n'
