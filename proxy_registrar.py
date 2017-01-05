@@ -9,6 +9,7 @@ import sys
 import json
 import time
 import xml.etree.ElementTree as ET
+import random
 
 
 class SIPRegisterHandler(socketserver.DatagramRequestHandler):
@@ -30,9 +31,15 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         print('Recibimos -> ' + info)
 
         if info.startswith('REGISTER'):
-            self.wfile.write(b'Manda el Auth!')
+            print(info)
+            self.nonce = ''
+            for i in range (10):
+                self.nonce += str(random.randint(0,9))
+            print(self.nonce)
+            self.wfile.write(b'SIP/2.0 401 Unauthorized\r\nWWW Authenticate: \
+Digest nonce=' + bytes(self.nonce,'utf-8'))
         else:
-            self.wfile.write(b'Recibido!')
+            self.wfile.write(b'MAAAL')
 
 '''
         if self.lists == []:
