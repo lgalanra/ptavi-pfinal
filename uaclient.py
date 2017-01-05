@@ -17,7 +17,6 @@ if __name__ == "__main__":
     except ValueError:
         sys.exit("Usage: python uaclient.py config method option")
 
-    #TEMA PORT
     expires = ''
     tree = ET.parse(CONFIG)
     root = tree.getroot()
@@ -72,6 +71,8 @@ audio ' + RTPPORT + ' RTP\r\n'
         info = text.decode('utf-8')
 
         print('RECIBIMOS: ' + info)
+
+#        if info.startswith('')
     '''
             if (info == 'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
                     '180 Ring\r\n\r\n SIP/2.0 200 OK\r\n\r\n'):
