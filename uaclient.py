@@ -44,8 +44,8 @@ if __name__ == "__main__":
     else:
         sys.exit('Usage: python uaclient.py config method option')
 
-    REGLINE = 'REGISTER sip:' + USER + ':' + PORT + ' SIP/2.0\r\nExpires:\
-     ' + expires + '\r\n'
+    REGLINE = 'REGISTER sip:' + USER + ':' + PORT + ' SIP/2.0\r\nExp\
+ires: ' + expires + '\r\n'
 
     INVLINE = 'INVITE sip:' + receiver + ' SIP/2.0\r\nContent-Type: applicat\
 ion/sdp\r\n\r\nv=0\r\no=' + USER + ' ' + IP + '\r\ns=mysession\r\nt=0\r\nm=\
@@ -61,24 +61,23 @@ audio ' + RTPPORT + ' RTP\r\n'
     elif METHOD == 'BYE':
         LINE = BYELINE
 
-print(REGLINE,INVLINE,ACKLINE,BYELINE)
-
-
-
     # Creamos el socket, lo configuramos y lo atamos a un servidor/puerto
-with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
-    my_socket.connect((PROXYIP, int(PROXYPORT)))
-    my_socket.send(bytes(LINE, 'utf-8'))
-    text = my_socket.recv(1024)
-    info = text.decode('utf-8')
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+        my_socket.connect((PROXYIP, int(PROXYPORT)))
 
-    print(info)
-'''
-        if (info == 'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
-                '180 Ring\r\n\r\n SIP/2.0 200 OK\r\n\r\n'):
-            print('Enviamos ACK')
-            my_socket.send(bytes(ACK, 'utf-8'))
-            text = my_socket.recv(1024)
+        print('ENVIANDO: ' + LINE)
+        my_socket.send(bytes(LINE, 'utf-8'))
 
-    print("Socket terminado.")
-'''
+        text = my_socket.recv(1024)
+        info = text.decode('utf-8')
+
+        print('RECIBIMOS: ' + info)
+    '''
+            if (info == 'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
+                    '180 Ring\r\n\r\n SIP/2.0 200 OK\r\n\r\n'):
+                print('Enviamos ACK')
+                my_socket.send(bytes(ACK, 'utf-8'))
+                text = my_socket.recv(1024)
+
+        print("Socket terminado.")
+    '''
