@@ -18,7 +18,7 @@ if __name__ == "__main__":
         sys.exit("Usage: python uaclient.py config method option")
 
     #TEMA PORT
-
+    expires = ''
     tree = ET.parse(CONFIG)
     root = tree.getroot()
 
@@ -29,6 +29,20 @@ if __name__ == "__main__":
     PROXYPORT = root.find('regproxy').attrib['port']
 
     print(USER, PASSWD, PORT, RTPPORT, PROXYPORT)
+
+    if METHOD == 'REGISTER':
+        receiver = root.find('regproxy').attrib['ip']
+        expires = sys.argv[3]
+    elif METHOD == 'INVITE':
+        receiver = sys.argv[3]
+    elif METHOD == 'BYE':
+        receiver = sys.argv[3]
+    else:
+        sys.exit('Usage: python uaclient.py config method option')
+
+    REGLINE = 'REGISTER sip:' + USER + ':' + PORT + ' SIP/2.0\r\nExpi\
+                res: ' + expires + '\r\n'
+
 
 '''
     INIT = METHOD + ' sip:' + LOGIN + '@' + IP + ' SIP/2.0\r\n\r\n'
