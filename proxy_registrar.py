@@ -28,7 +28,11 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         text = self.rfile.read()
         info = text.decode('utf-8')
         print('Recibimos -> ' + info)
-        self.wfile.write(b'Recibido!')
+
+        if info.startswith('REGISTER'):
+            self.wfile.write(b'Manda el Auth!')
+        else:
+            self.wfile.write(b'Recibido!')
 
 '''
         if self.lists == []:
