@@ -10,6 +10,7 @@ import json
 import time
 import xml.etree.ElementTree as ET
 import random
+import hashlib
 
 
 class SIPRegisterHandler(socketserver.DatagramRequestHandler):
@@ -20,6 +21,12 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     expire = ''
     lists = []
     direction = ''
+    nonce = ''
+    for i in range (10):
+        nonce += str(random.randint(0,9))
+
+# OJO! CAMBIAR NONCE PARA CADA USUARIO
+
 
     def handle(self):
         """
@@ -30,20 +37,41 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         info = text.decode('utf-8')
         print('Recibimos -> ' + info)
 
-        if info.startswith('REGISTER'):
-            self.nonce = ''
-            for i in range (10):
-                self.nonce += str(random.randint(0,9))
+
+        if info.find('Authorization') != -1:
+            print('VAMOS A COMPROBAAAAAAAAR ')
+            r = info.split('"')
+            response = r[1]
+            print('ESTO ES EL RESPONSE: ' + response)
+
+            print('Y ESTO EL NONCE QUE TENÍA: ' + self.nonce)
+
+
+            data = info.split(':')
+            user = data[1]
+            print(user + 'UEEEEEEEEEEEEEEEEEEE')
+            FILE = open('passwords.txt')
+            for line in FILE:
+                miau = line.split(',')
+                print(miau)
+                if user == miau[0]:
+                    print('SÍ QUE ESTÁ\r\n')
+                    self.password = miau[1]
+                    print(self.password)
+                print('LÍNEA DEL ARCHIVO')
+
+            myresponse = str(self.nonce) + str(self.password)
+            m = hashlib.sha1()
+            m.update(bytes(myresponse,'utf-8'))
+            m2 = m.digest()
+            print(m2)
+            print(response)
+            if str(m2) == str(response):
+                print('ESTÁ')
+        else:
             print(self.nonce)
             self.wfile.write(b'SIP/2.0 401 Unauthorized\r\nWWW Authenticate: \
 Digest nonce=' + bytes(self.nonce,'utf-8'))
-        else:
-            print('Recibimos ->AAAAAAAAAAAAAAAAAAAAAA ')
-
-        
-
-
-
 
 '''
         if self.lists == []:
