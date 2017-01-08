@@ -31,7 +31,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         print('Recibimos -> ' + info)
 
         if info.startswith('REGISTER'):
-            print(info)
             self.nonce = ''
             for i in range (10):
                 self.nonce += str(random.randint(0,9))
@@ -39,7 +38,12 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             self.wfile.write(b'SIP/2.0 401 Unauthorized\r\nWWW Authenticate: \
 Digest nonce=' + bytes(self.nonce,'utf-8'))
         else:
-            self.wfile.write(b'MAAAL')
+            print('Recibimos ->AAAAAAAAAAAAAAAAAAAAAA ')
+
+        
+
+
+
 
 '''
         if self.lists == []:
