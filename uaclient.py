@@ -7,6 +7,7 @@ Programa cliente SIP que abre un socket a un servidor
 import socket
 import sys
 import xml.etree.ElementTree as ET
+import hashlib
 
 
 if __name__ == "__main__":
@@ -72,7 +73,18 @@ audio ' + RTPPORT + ' RTP\r\n'
 
         print('RECIBIMOS: ' + info)
 
-#        if info.startswith('')
+        if info.startswith('SIP/2.0 401 Unauthorized'):
+            n = info.split('=')
+            nonce = n[1]
+            response = str(nonce) + str(PASSWD)
+            print(response)
+            m = hashlib.sha1()
+            m.update(bytes(response,'utf-8'))
+            m1 = m.digest()
+            print(m1)
+            my_socket.send(bytes(REGLINE,'utf-8') + b'Authorization: Digest response\
+ ="' + bytes(response,'utf-8') + b'"' )
+
     '''
             if (info == 'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
                     '180 Ring\r\n\r\n SIP/2.0 200 OK\r\n\r\n'):
