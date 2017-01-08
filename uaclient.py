@@ -74,6 +74,7 @@ audio ' + RTPPORT + ' RTP\r\n'
         print('RECIBIMOS: ' + info)
 
         if info.startswith('SIP/2.0 401 Unauthorized'):
+            print('ENVIAMOS Authorization')
             n = info.split('=')
             nonce = n[1]
             response = str(nonce) + str(PASSWD)
@@ -83,7 +84,7 @@ audio ' + RTPPORT + ' RTP\r\n'
             m1 = m.digest()
             print(m1)
             my_socket.send(bytes(REGLINE,'utf-8') + b'Authorization: Digest response\
- ="' + bytes(response,'utf-8') + b'"' )
+ ="' + bytes(str(m1),'utf-8') + b'"' )
 
     '''
             if (info == 'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
