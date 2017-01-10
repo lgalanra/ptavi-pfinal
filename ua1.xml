@@ -3,7 +3,7 @@
   </account>
   <uaserver ip="" port="4000">
   </uaserver>
-  <rtpaudio port="6000">
+  <rtpaudio port="8888">
   </rtpaudio>
   <regproxy ip="127.0.0.1" port="5000">
   </regproxy>
