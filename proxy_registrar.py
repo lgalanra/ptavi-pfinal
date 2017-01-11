@@ -5,6 +5,7 @@ Clase (y programa principal) para un servidor de eco en UDP simple
 """
 
 import socketserver
+import socket
 import sys
 import json
 import time
@@ -23,6 +24,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     users = []
     direction = ''
     nonce = ''
+    recvIP = ''
+    recvPORT = ''
     for i in range (10):
         nonce += str(random.randint(0,9))
 
@@ -62,7 +65,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             self.expire = e1[1]
 
 
-            self.register2json()
 
             print(self.user + 'UEEEEEEEEEEEEEEEEEEE')
             FILE = open('passwords.txt')
@@ -83,7 +85,45 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             print(response)
             if str(m2) == str(response):
                 print('ESTÁ')
-#                register2json()
+
+            self.register2json()
+        elif info.startswith('INVITE'):
+            a = info.split(':')
+            b = a[1].split(' ')
+            receiver = b[0]
+            found = False
+            for dicc in self.users:
+                if receiver == dicc['address']:
+                    found = True
+                    self.recvIP = dicc['ip']
+                    self.recvPORT = dicc['port']
+                    print('ENCONTRADOOOOOOOOOOOOOO')
+                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+                            my_socket.connect((self.recvIP, int(self.recvPORT)))
+
+                            print('ENVIANDO: ' + info)
+                            my_socket.send(bytes(info, 'utf-8'))
+
+                            text = my_socket.recv(1024)
+                            info = text.decode('utf-8')
+
+                            print('RECIBIMOS: ' + info)
+
+                            if info.startswith('SIP/2.0 100 Trying'):
+                                print('ENVIAMOS: ' + info)
+                                self.wfile.write(bytes(info,'utf-8'))
+
+            if not found:
+                self.wfile.write(b'SIP/2.0 404 User Not Found')
+
+        elif info.startswith('ACK'):
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+                my_socket.connect((self.recvIP, int(self.recvPORT)))
+
+                print('ENVIANDO: ' + info)
+                my_socket.send(bytes(info, 'utf-8'))
+
+
 
         else:
             print(self.nonce)
@@ -97,13 +137,14 @@ Digest nonce=' + bytes(self.nonce,'utf-8'))
 
         auxdicc = {'address': self.user, 'ip': self.ip, 'port': self.port,'regdate': self.regdate, 'expires': self.expire}
 
-#        for i in self.users:
-#            if i['address'] == self.direction:
-#                self.users.remove(l)
+        for dicc in self.users:
+            if dicc['address'] == self.user:
+                self.users.remove(dicc)
 
         self.users.append(auxdicc)
         exptime = time.strftime('%Y-%m-%d %H:%M:%S',time.gmtime(int(self.expire) + time.time()))
 
+#FALTA ESTE TEMA DEL EXPIRE
 #        for l in self.users:
 #            if l[1]['expires'] <= time.strftime('%Y-%m-%d %H:%M:%S',
 #                                                time.gmtime(time.time())):
