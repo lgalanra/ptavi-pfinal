@@ -131,14 +131,29 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
                 print('ENVIANDO: ' + info)
                 my_socket.send(bytes(info, 'utf-8'))
+
         elif info.startswith('BYE'):
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
                 a = info.split(':')
                 b = a[1].split(' ')
                 receiver = b[0]
                 for dicc in self.users:
-                    pass
+                    if receiver == dicc['address']:
+                        self.recvIP = dicc['ip']
+                        self.recvPORT = dicc['port']
+                print(self.recvIP, self.recvPORT)
+                my_socket.connect((self.recvIP, int(self.recvPORT)))
+                print('ENVIANDO ' + info)
+                my_socket.send(bytes(info,'utf-8'))
 
+                text = my_socket.recv(1024)
+                info = text.decode('utf-8')
+
+                print('RECIBIMOS -> ' + info)
+
+                if info.startswith('SIP/2.0 200 OK'):
+                    print('REENVÍO 200 OK!!')
+                    self.wfile.write(bytes(info,'utf-8'))
 
         else:
             print(self.nonce)
