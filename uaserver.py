@@ -26,7 +26,6 @@ class SIPHandler(socketserver.DatagramRequestHandler):
 
         if info.startswith('INVITE'):
             a = info.split(' ')
-            print(a)
             global RTPPORTrecv
             RTPPORTrecv = a[5]
 
@@ -36,16 +35,13 @@ class SIPHandler(socketserver.DatagramRequestHandler):
 
             inviteresp = 'SIP/2.0 100 Trying\r\n\r\nSIP/2.0 180 \
 Ring\r\n\r\nSIP/2.0 200 OK\r\n\r\n'
-            sdp = 'Content-Type: application/sdp\r\n\r\nv=0\r\no=' + USER + ' '
-            + IP + '\r\ns=mysession2\r\nt=0\r\nm=audio ' + RTPPORT
-            + ' RTP\r\n\r\n'
+            sdp = 'Content-Type: application/sdp\r\n\r\nv=0\r\no=' + USER + ' ' + IP + '\r\ns=mysession2\r\nt=0\r\nm=audio ' + RTPPORT + ' RTP\r\n\r\n'
 
             self.wfile.write(bytes(inviteresp + sdp, 'utf-8'))
 
         elif info.startswith('ACK'):
             # aEjecutar es un string con lo que se ha de ejecutar en la shell
-            aEjecutar = './mp32rtp -i ' + RTPIPrecv + ' -p ' + str(RTPPORTrecv)
-            + ' < ' + SONG
+            aEjecutar = './mp32rtp -i ' + RTPIPrecv + ' -p ' + str(RTPPORTrecv) + ' < ' + SONG
             print('Vamos a ejecutar', aEjecutar)
             os.system(aEjecutar)
         elif info.startswith('BYE'):
