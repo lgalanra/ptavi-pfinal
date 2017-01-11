@@ -69,43 +69,43 @@ audio ' + RTPPORT + ' RTP\r\n\r\n'
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
         my_socket.connect((PROXYIP, int(PROXYPORT)))
 
-        doc = open(LOG,'a+')
+        doc = open(LOG, 'a+')
         doc.write('\r\nStarting...')
         doc.close()
         print('ENVIANDO: ' + LINE)
         my_socket.send(bytes(LINE, 'utf-8'))
-        doc = open(LOG,'a+')
+        doc = open(LOG, 'a+')
         doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
-%S',time.gmtime(time.time())) + ' Sent to ' + PROXYIP + ':' + PROXYPORT + ':' +
-LINE.replace('\r\n',' '))
+%S', time.gmtime(time.time())) + ' Sent to ' + PROXYIP + ':' + PROXYPORT + ':' +
+LINE.replace('\r\n', ' '))
         doc.close()
 
         text = my_socket.recv(1024)
         info = text.decode('utf-8')
-
         print('RECIBIMOS: ' + info)
-        doc = open(LOG,'a+')
+
+        doc = open(LOG, 'a+')
         doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
 %S',time.gmtime(time.time())) + ' Received from ' + PROXYIP + ':' + PROXYPORT + ':' +
 info.replace('\r\n',' '))
         doc.close()
 
         if info.startswith('SIP/2.0 401 Unauthorized'):
-            print('ENVIAMOS Authorization')
             n = info.split('=')
             nonce = n[1]
             response = str(nonce) + str(PASSWD)
-            print(response)
             m = hashlib.sha1()
             m.update(bytes(response, 'utf-8'))
             m1 = m.digest()
-            print(m1)
-            my_socket.send(bytes(REGLINE, 'utf-8') + b'Authorization: Digest response\
- ="' + bytes(str(m1), 'utf-8') + b'"')
+            my_socket.send(bytes(REGLINE, 'utf-8') + b'Authorization: \
+Digest response ="' + bytes(str(m1), 'utf-8') + b'"')
             doc = open(LOG,'a+')
             doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
 %S',time.gmtime(time.time())) + ' Sent to ' + PROXYIP + ':' + PROXYPORT + ':' +
-REGLINE.replace('\r\n',' '))
+REGLINE.replace('\r\n',' ') +'Authorization: Digest response="' + str(m1) + '"')
+            doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+%S',time.gmtime(time.time())) + ' Received from ' + PROXYIP + ':' +
+ PROXYPORT + ':' + 'SIP/2.0 200 OK')
             doc.close()
 
         elif info.startswith('SIP/2.0 100 Trying'):
@@ -129,6 +129,9 @@ ACKLINE.replace('\r\n',' '))
         elif info.startswith('SIP/2.0 200 OK'):
             print('Fin.')
             doc = open(LOG,'a+')
+            doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+%S',time.gmtime(time.time())) + ' Received from ' + PROXYIP + ':' + PROXYPORT +
+':' + info.replace('\r\n',' '))
             doc.write('\r\nFinishing...')
             doc.close()
         else:
