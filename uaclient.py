@@ -85,9 +85,12 @@ audio ' + RTPPORT + ' RTP\r\n'
             print(m1)
             my_socket.send(bytes(REGLINE,'utf-8') + b'Authorization: Digest response\
  ="' + bytes(str(m1),'utf-8') + b'"' )
+
         elif info.startswith('SIP/2.0 100 Trying'):
             my_socket.send(bytes(ACKLINE,'utf-8'))
             print('MANDO AAAAACKKKKKKKKKKKKKKKKK')
+        elif info.startswith('SIP/2.0 200 OK'):
+            print('SE ACABÓOOOOOOOOOOOOOOOOOO')
         else:
             pass
 
