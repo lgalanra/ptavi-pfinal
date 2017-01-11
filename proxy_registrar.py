@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+ #!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Clase (y programa principal) para un servidor de eco en UDP simple
@@ -165,6 +165,9 @@ Digest nonce=' + bytes(self.nonce,'utf-8'))
         Método para almacenar correctamente los datos al json
         """
 
+        if self.users == []:
+            self.json2registered()
+
         auxdicc = {'address': self.user, 'ip': self.ip, 'port': self.port,'regdate': self.regdate, 'expires': self.expire}
 
         for dicc in self.users:
@@ -172,40 +175,16 @@ Digest nonce=' + bytes(self.nonce,'utf-8'))
                 self.users.remove(dicc)
 
         self.users.append(auxdicc)
-        exptime = time.strftime('%Y-%m-%d %H:%M:%S',time.gmtime(int(self.expire) + time.time()))
-
-#FALTA ESTE TEMA DEL EXPIRE
-#        for l in self.users:
-#            if l[1]['expires'] <= time.strftime('%Y-%m-%d %H:%M:%S',
-#                                                time.gmtime(time.time())):
-#            self.users.remove(l)
+#        exptime = time.strftime('%Y-%m-%d %H:%M:%S',time.gmtime(int(self.expire) + time.time()))
 
         json.dump(self.users, open("registered.json", 'w'),
                   sort_keys=True, indent=4, separators=(',', ': '))
 
 
-'''
-        if self.users == []:
-            self.json2registered()
-
-        print(self.client_address)
-        request = self.rfile.read().decode('utf-8')
-        print(request)
-        fields = request.split(' ')
-
-        if fields[0] == 'REGISTER':
-            login = fields[1].split(':')
-            self.direction = login[1]
-            self.dicc[self.direction] = self.client_address[0]
-            aux = fields[3].split('\r')
-
-            self.expire = int(aux[0])
-            if self.expire == 0:
-                del self.dicc[self.direction]
-
-        self.register2json()
-        self.wfile.write(b"SIP/2.0 200 OK " + b'\r\n\r\n')
-        print(self.dicc)
+    def checkuser_ondate(self):
+        for dicc in self.users:
+            if (float(dicc['expires']) + (dicc['regdate'])) <= time.time():
+                self.users.remove(dicc)
 
 
     def json2registered(self):
@@ -216,7 +195,7 @@ Digest nonce=' + bytes(self.nonce,'utf-8'))
             self.users = json.load(open(REGUSERS, 'r'))
         except:
             pass
-'''
+
 if __name__ == "__main__":
     try:
         CONFIG = sys.argv[1]
