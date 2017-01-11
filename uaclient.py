@@ -94,12 +94,5 @@ audio ' + RTPPORT + ' RTP\r\n'
         else:
             pass
 
-    '''
-            if (info == 'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
-                    '180 Ring\r\n\r\n SIP/2.0 200 OK\r\n\r\n'):
-                print('Enviamos ACK')
-                my_socket.send(bytes(ACK, 'utf-8'))
-                text = my_socket.recv(1024)
 
-        print("Socket terminado.")
-    '''
+#        print("Socket terminado.")
