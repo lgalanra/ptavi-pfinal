@@ -25,21 +25,43 @@ class SIPHandler(socketserver.DatagramRequestHandler):
         print('Recibimos -> ' + info)
 
         if info.startswith('INVITE'):
+            a = info.split(' ')
+            print(a)
+            global RTPPORTrecv
+            RTPPORTrecv = a[5]
+            print(RTPPORTrecv)
+
+            b = a[4].split('\r\n')
+            global RTPIPrecv
+            RTPIPrecv = b[0]
+            print(RTPIPrecv)
+
+            print('IP Y PUERTO RTP EXTRAÍDOS!!!!!!!')
             self.wfile.write(
                 b'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
                 b'180 Ring\r\n\r\n SIP/2.0 200 OK\r\n\r\n')
+
+
+
         elif info.startswith('ACK'):
             print('YIIIIIIIIHAAAAAAAAAAAAAAAAAACK')
+            print('VAMOS A MANDAR CANCIÓN A: ' + RTPIPrecv + ' ' + str(RTPPORTrecv))
             # aEjecutar es un string con lo que se ha de ejecutar en la shell
-#            aEjecutar = './mp32rtp -i 127.0.0.1 -p 23032 < ' + fichero_audio
-#            print('Vamos a ejecutar', aEjecutar)
-#            os.system(aEjecutar)
-#        elif info.startswith('BYE'):
-#            self.wfile.write(b'SIP/2.0 200 OK\r\n\r\n')
+            aEjecutar = './mp32rtp -i RTPIPrecv -p RTPPORTrecv < ' + SONG
+            print('Vamos a ejecutar', aEjecutar)
+            os.system(aEjecutar)
+            print('EJECUTADO!')
+        elif info.startswith('BYE'):
+            print('RECIBIDO BYE! MANDO 200 OK')
+            self.wfile.write(b'SIP/2.0 200 OK\r\n\r\n')
         else:
             pass #self.wfile.write(b'SIP/2.0 405 Method not Allowed\r\n\r\n')
 
 if __name__ == "__main__":
+
+    RTPIPrecv = ''
+    RTPPORTrecv = 0
+
     try:
         CONFIG = sys.argv[1]
         tree = ET.parse(CONFIG)
@@ -51,6 +73,7 @@ if __name__ == "__main__":
             IP = IP
         PORT = root.find('uaserver').attrib['port']
         RTPPORT = root.find('rtpaudio').attrib['port']
+        SONG = root.find('audio').attrib['path']
 
     except ValueError:
         print("Usage: python uaserver.py config")
