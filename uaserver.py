@@ -23,21 +23,22 @@ class SIPHandler(socketserver.DatagramRequestHandler):
         text = self.rfile.read()
         info = text.decode('utf-8')
         print('Recibimos -> ' + info)
-'''
+
         if info.startswith('INVITE'):
             self.wfile.write(
                 b'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
                 b'180 Ring\r\n\r\n SIP/2.0 200 OK\r\n\r\n')
         elif info.startswith('ACK'):
+            print('YIIIIIIIIHAAAAAAAAAAAAAAAAAA')
             # aEjecutar es un string con lo que se ha de ejecutar en la shell
-            aEjecutar = './mp32rtp -i 127.0.0.1 -p 23032 < ' + fichero_audio
-            print('Vamos a ejecutar', aEjecutar)
-            os.system(aEjecutar)
-        elif info.startswith('BYE'):
-            self.wfile.write(b'SIP/2.0 200 OK\r\n\r\n')
+#            aEjecutar = './mp32rtp -i 127.0.0.1 -p 23032 < ' + fichero_audio
+#            print('Vamos a ejecutar', aEjecutar)
+#            os.system(aEjecutar)
+#        elif info.startswith('BYE'):
+#            self.wfile.write(b'SIP/2.0 200 OK\r\n\r\n')
         else:
-            self.wfile.write(b'SIP/2.0 405 Method not Allowed\r\n\r\n')
-'''
+            pass #self.wfile.write(b'SIP/2.0 405 Method not Allowed\r\n\r\n')
+
 if __name__ == "__main__":
     try:
         CONFIG = sys.argv[1]
