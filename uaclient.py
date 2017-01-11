@@ -9,6 +9,7 @@ import sys
 import xml.etree.ElementTree as ET
 import hashlib
 import os
+import time
 
 
 if __name__ == "__main__":
@@ -35,6 +36,7 @@ if __name__ == "__main__":
     PROXYIP = root.find('regproxy').attrib['ip']
     PROXYPORT = root.find('regproxy').attrib['port']
     SONG = root.find('audio').attrib['path']
+    LOG = root.find('log').attrib['path']
 
     if METHOD == 'REGISTER':
         receiver = root.find('regproxy').attrib['ip']
@@ -67,13 +69,26 @@ audio ' + RTPPORT + ' RTP\r\n\r\n'
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
         my_socket.connect((PROXYIP, int(PROXYPORT)))
 
+        doc = open(LOG,'a+')
+        doc.write('\r\nStarting...')
+        doc.close()
         print('ENVIANDO: ' + LINE)
         my_socket.send(bytes(LINE, 'utf-8'))
+        doc = open(LOG,'a+')
+        doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+%S',time.gmtime(time.time())) + ' Sent to ' + PROXYIP + ':' + PROXYPORT + ':' +
+LINE.replace('\r\n',' '))
+        doc.close()
 
         text = my_socket.recv(1024)
         info = text.decode('utf-8')
 
         print('RECIBIMOS: ' + info)
+        doc = open(LOG,'a+')
+        doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+%S',time.gmtime(time.time())) + ' Received from ' + PROXYIP + ':' + PROXYPORT + ':' +
+info.replace('\r\n',' '))
+        doc.close()
 
         if info.startswith('SIP/2.0 401 Unauthorized'):
             print('ENVIAMOS Authorization')
@@ -87,6 +102,11 @@ audio ' + RTPPORT + ' RTP\r\n\r\n'
             print(m1)
             my_socket.send(bytes(REGLINE, 'utf-8') + b'Authorization: Digest response\
  ="' + bytes(str(m1), 'utf-8') + b'"')
+            doc = open(LOG,'a+')
+            doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+%S',time.gmtime(time.time())) + ' Sent to ' + PROXYIP + ':' + PROXYPORT + ':' +
+REGLINE.replace('\r\n',' '))
+            doc.close()
 
         elif info.startswith('SIP/2.0 100 Trying'):
             a = info.split(' ')
@@ -95,6 +115,11 @@ audio ' + RTPPORT + ' RTP\r\n\r\n'
             RTPIPrecv2 = b[0]
 
             my_socket.send(bytes(ACKLINE, 'utf-8'))
+            doc = open(LOG,'a+')
+            doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+%S',time.gmtime(time.time())) + ' Sent to ' + PROXYIP + ':' + PROXYPORT + ':' +
+ACKLINE.replace('\r\n',' '))
+            doc.close()
             # aEjecutar es un string con lo que se ha de ejecutar en la shell
             aEjecutar = './mp32rtp -i ' + RTPIPrecv2 + ' -p\
  ' + str(RTPPORTrecv2) + ' < ' + SONG
@@ -103,5 +128,8 @@ audio ' + RTPPORT + ' RTP\r\n\r\n'
 
         elif info.startswith('SIP/2.0 200 OK'):
             print('Fin.')
+            doc = open(LOG,'a+')
+            doc.write('\r\nFinishing...')
+            doc.close()
         else:
             pass
