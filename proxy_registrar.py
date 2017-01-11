@@ -38,12 +38,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         self.checkuser_ondate()
 
         if info.find('Authorization') != -1:
-            print('VAMOS A COMPROBAAAAAAAAR ')
             r = info.split('"')
             response = r[1]
-            print('ESTO ES EL RESPONSE: ' + response)
-
-            print('Y ESTO EL NONCE QUE TENÍA: ' + self.nonce)
 
             data = info.split(':')
 
@@ -58,25 +54,18 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             e1 = e[0].split(' ')
             self.expire = e1[1]
 
-            print(self.user + 'UEEEEEEEEEEEEEEEEEEE')
             FILE = open('passwords.txt')
             for line in FILE:
-                miau = line.split(',')
-                print(miau)
-                if self.user == miau[0]:
-                    print('SÍ QUE ESTÁ\r\n')
-                    self.password = miau[1]
-                    print(self.password)
-                print('LÍNEA DEL ARCHIVO')
+                a = line.split(',')
+                if self.user == a[0]:
+                    self.password = a[1]
 
             myresponse = str(self.nonce) + str(self.password)
             m = hashlib.sha1()
             m.update(bytes(myresponse, 'utf-8'))
             m2 = m.digest()
-            print(m2)
-            print(response)
             if str(m2) == str(response):
-                print('ESTÁ')
+                print('OK, REGISTRADO')
 
             self.register2json()
         elif info.startswith('INVITE'):
@@ -94,7 +83,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     global recvPORT
                     recvIP = dicc['ip']
                     recvPORT = dicc['port']
-                    print('ENCONTRADOOOOOOOOOOOOOO')
                     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
                     as my_socket:
                             my_socket.connect((recvIP, int(recvPORT)))
@@ -126,8 +114,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
                 my_socket.connect((recvIP, int(recvPORT)))
 
-                print(recvIP, recvPORT)
-
                 print('ENVIANDO: ' + info)
                 my_socket.send(bytes(info, 'utf-8'))
 
@@ -140,9 +126,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     if receiver == dicc['address']:
                         recvIP = dicc['ip']
                         recvPORT = dicc['port']
-                print(recvIP, recvPORT)
                 my_socket.connect((recvIP, int(recvPORT)))
-                print('ENVIANDO ' + info)
+                print('ENVIANDO: ' + info)
                 my_socket.send(bytes(info, 'utf-8'))
 
                 text = my_socket.recv(1024)
@@ -151,7 +136,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 print('RECIBIMOS -> ' + info)
 
                 if info.startswith('SIP/2.0 200 OK'):
-                    print('REENVÍO 200 OK!!')
                     self.wfile.write(bytes(info, 'utf-8'))
 
         else:
