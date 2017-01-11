@@ -45,9 +45,10 @@ class SIPHandler(socketserver.DatagramRequestHandler):
 
         elif info.startswith('ACK'):
             print('YIIIIIIIIHAAAAAAAAAAAAAAAAAACK')
+            print(SONG)
             print('VAMOS A MANDAR CANCIÓN A: ' + RTPIPrecv + ' ' + str(RTPPORTrecv))
             # aEjecutar es un string con lo que se ha de ejecutar en la shell
-            aEjecutar = './mp32rtp -i RTPIPrecv -p RTPPORTrecv < ' + SONG
+            aEjecutar = './mp32rtp -i ' + RTPIPrecv + ' -p ' + str(RTPPORTrecv) + ' < ' + SONG
             print('Vamos a ejecutar', aEjecutar)
             os.system(aEjecutar)
             print('EJECUTADO!')
