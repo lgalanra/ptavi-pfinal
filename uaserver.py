@@ -38,11 +38,12 @@ class SIPHandler(socketserver.DatagramRequestHandler):
 
             print('IP Y PUERTO RTP EXTRAÍDOS!!!!!!!')
 
-            inviteresp = 'SIP/2.0 100 Trying\r\n\r\nSIP/2.0 180\
+            inviteresp = 'SIP/2.0 100 Trying\r\n\r\nSIP/2.0 180 \
 Ring\r\n\r\nSIP/2.0 200 OK\r\n\r\n'
-            sdp = 'Content-Type: application/sdp\r\n\r\nv=0\r\no=' + USER + ' ' + IP + '\r\ns=mysession2\r\nt=0\r\nm=audio ' + RTPPORT + ' RTP\r\n'
+            sdp = 'Content-Type: application/sdp\r\n\r\nv=0\r\no=' + USER + ' ' + IP + '\r\ns=mysession2\r\nt=0\r\nm=audio ' + RTPPORT + ' RTP\r\n\r\n'
 
             self.wfile.write(bytes(inviteresp + sdp,'utf-8'))
+            print('POLLAGORDAAAAAAAAAAAAAAAAAAAAAAAAAA')
 
 
 
