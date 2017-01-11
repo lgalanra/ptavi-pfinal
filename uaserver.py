@@ -37,9 +37,12 @@ class SIPHandler(socketserver.DatagramRequestHandler):
             print(RTPIPrecv)
 
             print('IP Y PUERTO RTP EXTRAÍDOS!!!!!!!')
-            self.wfile.write(
-                b'SIP/2.0 100 Trying\r\n\r\n SIP/2.0 ' +
-                b'180 Ring\r\n\r\n SIP/2.0 200 OK\r\n\r\n')
+
+            inviteresp = 'SIP/2.0 100 Trying\r\n\r\nSIP/2.0 180\
+Ring\r\n\r\nSIP/2.0 200 OK\r\n\r\n'
+            sdp = 'Content-Type: application/sdp\r\n\r\nv=0\r\no=' + USER + ' ' + IP + '\r\ns=mysession2\r\nt=0\r\nm=audio ' + RTPPORT + ' RTP\r\n'
+
+            self.wfile.write(bytes(inviteresp + sdp,'utf-8'))
 
 
 
@@ -67,6 +70,7 @@ if __name__ == "__main__":
         CONFIG = sys.argv[1]
         tree = ET.parse(CONFIG)
         root = tree.getroot()
+        USER = root.find('account').attrib['username']
         IP = root.find('uaserver').attrib['ip']
         if IP == '':
             IP = '127.0.0.1'
