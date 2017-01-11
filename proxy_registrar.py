@@ -68,6 +68,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 print('OK, REGISTRADO')
 
             self.register2json()
+            self.wfile.write(bytes('SIP/2.0 200 OK', 'utf-8'))
+
         elif info.startswith('INVITE'):
 
             self.json2registered()
@@ -83,21 +85,20 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     global recvPORT
                     recvIP = dicc['ip']
                     recvPORT = dicc['port']
-                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-                    as my_socket:
-                            my_socket.connect((recvIP, int(recvPORT)))
+                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+                        my_socket.connect((recvIP, int(recvPORT)))
 
-                            print('ENVIANDO: ' + info)
-                            my_socket.send(bytes(info, 'utf-8'))
+                        print('ENVIANDO: ' + info)
+                        my_socket.send(bytes(info, 'utf-8'))
 
-                            text = my_socket.recv(1024)
-                            info = text.decode('utf-8')
+                        text = my_socket.recv(1024)
+                        info = text.decode('utf-8')
 
-                            print('RECIBIMOS: ' + info)
+                        print('RECIBIMOS: ' + info)
 
-                            if info.startswith('SIP/2.0 100 Trying'):
-                                print('ENVIAMOS: ' + info)
-                                self.wfile.write(bytes(info, 'utf-8'))
+                        if info.startswith('SIP/2.0 100 Trying'):
+                            print('ENVIAMOS: ' + info)
+                            self.wfile.write(bytes(info, 'utf-8'))
 
             if not found:
                 self.wfile.write(b'SIP/2.0 404 User Not Found\r\n\r\n')
@@ -159,8 +160,6 @@ date': self.regdate, 'expires': self.expire}
                 self.users.remove(dicc)
 
         self.users.append(auxdicc)
-#        exptime = time.strftime('%Y-%m-%d %H:%M:%S',time.gmtim
-# e(int(self.expire) + time.time()))
 
         self.checkuser_ondate()
 
