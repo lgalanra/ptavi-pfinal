@@ -40,19 +40,18 @@ class SIPHandler(socketserver.DatagramRequestHandler):
 
             inviteresp = 'SIP/2.0 100 Trying\r\n\r\nSIP/2.0 180 \
 Ring\r\n\r\nSIP/2.0 200 OK\r\n\r\n'
-            sdp = 'Content-Type: application/sdp\r\n\r\nv=0\r\no=' + USER + ' ' + IP + '\r\ns=mysession2\r\nt=0\r\nm=audio ' + RTPPORT + ' RTP\r\n\r\n'
+            sdp = 'Content-Type: application/sdp\r\n\r\nv=0\r\no=' + USER + ' '
+            + IP + '\r\ns=mysession2\r\nt=0\r\nm=audio ' + RTPPORT
+            + ' RTP\r\n\r\n'
 
-            self.wfile.write(bytes(inviteresp + sdp,'utf-8'))
-            print('POLLAGORDAAAAAAAAAAAAAAAAAAAAAAAAAA')
-
-
+            self.wfile.write(bytes(inviteresp + sdp, 'utf-8'))
 
         elif info.startswith('ACK'):
             print('YIIIIIIIIHAAAAAAAAAAAAAAAAAACK')
             print(SONG)
-            print('VAMOS A MANDAR CANCIÓN A: ' + RTPIPrecv + ' ' + str(RTPPORTrecv))
             # aEjecutar es un string con lo que se ha de ejecutar en la shell
-            aEjecutar = './mp32rtp -i ' + RTPIPrecv + ' -p ' + str(RTPPORTrecv) + ' < ' + SONG
+            aEjecutar = './mp32rtp -i ' + RTPIPrecv + ' -p ' + str(RTPPORTrecv)
+            + ' < ' + SONG
             print('Vamos a ejecutar', aEjecutar)
             os.system(aEjecutar)
             print('EJECUTADO!')
@@ -60,7 +59,7 @@ Ring\r\n\r\nSIP/2.0 200 OK\r\n\r\n'
             print('RECIBIDO BYE! MANDO 200 OK')
             self.wfile.write(b'SIP/2.0 200 OK\r\n\r\n')
         else:
-            pass #self.wfile.write(b'SIP/2.0 405 Method not Allowed\r\n\r\n')
+            self.wfile.write(b'SIP/2.0 405 Method not Allowed\r\n\r\n')
 
 if __name__ == "__main__":
 
@@ -86,7 +85,6 @@ if __name__ == "__main__":
     serv = socketserver.UDPServer(('', int(PORT)), SIPHandler)
     print("Listening...")
 
-    print(IP,PORT,RTPPORT)
     try:
         serv.serve_forever()
     except KeyboardInterrupt:
