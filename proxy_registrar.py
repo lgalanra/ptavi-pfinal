@@ -34,6 +34,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
         text = self.rfile.read()
         info = text.decode('utf-8')
+
         print('Recibimos -> ' + info)
         self.checkuser_ondate()
 
@@ -45,10 +46,14 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
             self.user = data[1]
             self.ip = self.client_address[0]
-            print(self.ip)
             p = data[2].split(' ')
             self.port = p[0]
             self.regdate = time.time()
+            doc = open(LOG,'a+')
+            doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+    %S',time.gmtime(time.time())) + ' Received from ' + self.ip + ':' + self.port + ':' +
+    info.replace('\r\n',' '))
+            doc.close()
 
             e = data[3].split('\r\n')
             e1 = e[0].split(' ')
@@ -90,15 +95,28 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
                         print('ENVIANDO: ' + info)
                         my_socket.send(bytes(info, 'utf-8'))
+                        doc = open(LOG,'a+')
+                        doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+                %S',time.gmtime(time.time())) + ' Sent to ' + recvIP + ':' + recvPORT + ':' +
+                info.replace('\r\n',' '))
+                        doc.close()
 
                         text = my_socket.recv(1024)
                         info = text.decode('utf-8')
 
                         print('RECIBIMOS: ' + info)
-
+                        doc = open(LOG,'a+')
+                        doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+%S',time.gmtime(time.time())) + ' Received from ' + recvIP + ':' + recvPORT + ':' + info.replace('\r\n',' '))
+                        doc.close()
                         if info.startswith('SIP/2.0 100 Trying'):
                             print('ENVIAMOS: ' + info)
                             self.wfile.write(bytes(info, 'utf-8'))
+                            doc = open(LOG,'a+')
+                            doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+                    %S',time.gmtime(time.time())) + ' Sent to ' + recvIP + ':' + recvPORT + ':' +
+                    info.replace('\r\n',' '))
+                            doc.close()
 
             if not found:
                 self.wfile.write(b'SIP/2.0 404 User Not Found\r\n\r\n')
@@ -117,6 +135,11 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
                 print('ENVIANDO: ' + info)
                 my_socket.send(bytes(info, 'utf-8'))
+                doc = open(LOG,'a+')
+                doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+%S',time.gmtime(time.time())) + ' Sent to ' + recvIP + ':' + recvPORT + ':' +
+info.replace('\r\n',' '))
+                doc.close()
 
         elif info.startswith('BYE'):
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
@@ -130,6 +153,11 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 my_socket.connect((recvIP, int(recvPORT)))
                 print('ENVIANDO: ' + info)
                 my_socket.send(bytes(info, 'utf-8'))
+                doc = open(LOG,'a+')
+                doc.write('\r\n' + time.strftime('%Y%m%d%H%M\
+        %S',time.gmtime(time.time())) + ' Sent to ' + recvIP + ':' + recvPORT + ':' +
+        info.replace('\r\n',' '))
+                doc.close()
 
                 text = my_socket.recv(1024)
                 info = text.decode('utf-8')
@@ -140,7 +168,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     self.wfile.write(bytes(info, 'utf-8'))
 
         else:
-            print(self.nonce)
             self.wfile.write(b'SIP/2.0 401 Unauthorized\r\n\r\nWWW Authenticate: \
 Digest nonce=' + bytes(self.nonce, 'utf-8'))
 
@@ -203,6 +230,9 @@ if __name__ == "__main__":
         print("Usage: python proxy_registrar.py config")
     serv = socketserver.UDPServer(('', int(PORT)), SIPRegisterHandler)
     print('Server ' + NAME + ' listening at port ' + PORT + '...')
+    doc = open(LOG,'a+')
+    doc.write('\r\nStarting...')
+    doc.close()
     try:
         serv.serve_forever()
     except KeyboardInterrupt:
