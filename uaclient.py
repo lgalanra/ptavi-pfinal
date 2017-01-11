@@ -46,15 +46,15 @@ if __name__ == "__main__":
     else:
         sys.exit('Usage: python uaclient.py config method option')
 
-    REGLINE = 'REGISTER sip:' + USER + ':' + PORT + ' SIP/2.0\r\nExp\
-ires: ' + expires + '\r\n'
+    REGLINE = 'REGISTER sip:' + USER + ':' + PORT + ' SIP/2.0\r\n\r\nExp\
+ires: ' + expires + '\r\n\r\n'
 
-    INVLINE = 'INVITE sip:' + receiver + ' SIP/2.0\r\nContent-Type: applicat\
+    INVLINE = 'INVITE sip:' + receiver + ' SIP/2.0\r\n\r\nContent-Type: applicat\
 ion/sdp\r\n\r\nv=0\r\no=' + USER + ' ' + IP + '\r\ns=mysession\r\nt=0\r\nm=\
-audio ' + RTPPORT + ' RTP\r\n'
+audio ' + RTPPORT + ' RTP\r\n\r\n'
 
-    ACKLINE = 'ACK sip:' + receiver + ' SIP/2.0\r\n'
-    BYELINE = 'BYE sip:' + receiver + ' SIP/2.0\r\n'
+    ACKLINE = 'ACK sip:' + receiver + ' SIP/2.0\r\n\r\n'
+    BYELINE = 'BYE sip:' + receiver + ' SIP/2.0\r\n\r\n'
 
     if METHOD == 'REGISTER':
         LINE = REGLINE
