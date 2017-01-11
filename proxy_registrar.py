@@ -1,4 +1,4 @@
- #!/usr/bin/python3
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 """
 Clase (y programa principal) para un servidor de eco en UDP simple
@@ -22,14 +22,10 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     dicc = {}
     expire = ''
     users = []
-    direction = ''
     nonce = ''
 
-    for i in range (10):
-        nonce += str(random.randint(0,9))
-
-# OJO! CAMBIAR NONCE PARA CADA USUARIO
-
+    for i in range(10):
+        nonce += str(random.randint(0, 9))
 
     def handle(self):
         """
@@ -48,7 +44,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             print('ESTO ES EL RESPONSE: ' + response)
 
             print('Y ESTO EL NONCE QUE TENÍA: ' + self.nonce)
-
 
             data = info.split(':')
 
@@ -76,7 +71,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
             myresponse = str(self.nonce) + str(self.password)
             m = hashlib.sha1()
-            m.update(bytes(myresponse,'utf-8'))
+            m.update(bytes(myresponse, 'utf-8'))
             m2 = m.digest()
             print(m2)
             print(response)
@@ -100,7 +95,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                     recvIP = dicc['ip']
                     recvPORT = dicc['port']
                     print('ENCONTRADOOOOOOOOOOOOOO')
-                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+                    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+                    as my_socket:
                             my_socket.connect((recvIP, int(recvPORT)))
 
                             print('ENVIANDO: ' + info)
@@ -113,7 +109,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
                             if info.startswith('SIP/2.0 100 Trying'):
                                 print('ENVIAMOS: ' + info)
-                                self.wfile.write(bytes(info,'utf-8'))
+                                self.wfile.write(bytes(info, 'utf-8'))
 
             if not found:
                 self.wfile.write(b'SIP/2.0 404 User Not Found\r\n\r\n')
@@ -130,7 +126,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
                 my_socket.connect((recvIP, int(recvPORT)))
 
-                print(recvIP,recvPORT)
+                print(recvIP, recvPORT)
 
                 print('ENVIANDO: ' + info)
                 my_socket.send(bytes(info, 'utf-8'))
@@ -147,7 +143,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 print(recvIP, recvPORT)
                 my_socket.connect((recvIP, int(recvPORT)))
                 print('ENVIANDO ' + info)
-                my_socket.send(bytes(info,'utf-8'))
+                my_socket.send(bytes(info, 'utf-8'))
 
                 text = my_socket.recv(1024)
                 info = text.decode('utf-8')
@@ -156,12 +152,12 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
                 if info.startswith('SIP/2.0 200 OK'):
                     print('REENVÍO 200 OK!!')
-                    self.wfile.write(bytes(info,'utf-8'))
+                    self.wfile.write(bytes(info, 'utf-8'))
 
         else:
             print(self.nonce)
             self.wfile.write(b'SIP/2.0 401 Unauthorized\r\n\r\nWWW Authenticate: \
-Digest nonce=' + bytes(self.nonce,'utf-8'))
+Digest nonce=' + bytes(self.nonce, 'utf-8'))
 
     def register2json(self):
         """
@@ -171,26 +167,26 @@ Digest nonce=' + bytes(self.nonce,'utf-8'))
         if self.users == []:
             self.json2registered()
 
-        auxdicc = {'address': self.user, 'ip': self.ip, 'port': self.port,'regdate': self.regdate, 'expires': self.expire}
+        auxdicc = {'address': self.user, 'ip': self.ip, 'port': self.port, 'reg\
+date': self.regdate, 'expires': self.expire}
 
         for dicc in self.users:
             if dicc['address'] == self.user:
                 self.users.remove(dicc)
 
         self.users.append(auxdicc)
-#        exptime = time.strftime('%Y-%m-%d %H:%M:%S',time.gmtime(int(self.expire) + time.time()))
+#        exptime = time.strftime('%Y-%m-%d %H:%M:%S',time.gmtim
+# e(int(self.expire) + time.time()))
 
         self.checkuser_ondate()
 
         json.dump(self.users, open("registered.json", 'w'),
                   sort_keys=True, indent=4, separators=(',', ': '))
 
-
     def checkuser_ondate(self):
         for dicc in self.users:
             if (float(dicc['expires']) + (dicc['regdate'])) <= time.time():
                 self.users.remove(dicc)
-
 
     def json2registered(self):
         """
