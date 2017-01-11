@@ -29,14 +29,10 @@ class SIPHandler(socketserver.DatagramRequestHandler):
             print(a)
             global RTPPORTrecv
             RTPPORTrecv = a[5]
-            print(RTPPORTrecv)
 
             b = a[4].split('\r\n')
             global RTPIPrecv
             RTPIPrecv = b[0]
-            print(RTPIPrecv)
-
-            print('IP Y PUERTO RTP EXTRAÍDOS!!!!!!!')
 
             inviteresp = 'SIP/2.0 100 Trying\r\n\r\nSIP/2.0 180 \
 Ring\r\n\r\nSIP/2.0 200 OK\r\n\r\n'
@@ -47,16 +43,12 @@ Ring\r\n\r\nSIP/2.0 200 OK\r\n\r\n'
             self.wfile.write(bytes(inviteresp + sdp, 'utf-8'))
 
         elif info.startswith('ACK'):
-            print('YIIIIIIIIHAAAAAAAAAAAAAAAAAACK')
-            print(SONG)
             # aEjecutar es un string con lo que se ha de ejecutar en la shell
             aEjecutar = './mp32rtp -i ' + RTPIPrecv + ' -p ' + str(RTPPORTrecv)
             + ' < ' + SONG
             print('Vamos a ejecutar', aEjecutar)
             os.system(aEjecutar)
-            print('EJECUTADO!')
         elif info.startswith('BYE'):
-            print('RECIBIDO BYE! MANDO 200 OK')
             self.wfile.write(b'SIP/2.0 200 OK\r\n\r\n')
         else:
             self.wfile.write(b'SIP/2.0 405 Method not Allowed\r\n\r\n')
