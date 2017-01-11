@@ -8,6 +8,7 @@ import socket
 import sys
 import xml.etree.ElementTree as ET
 import hashlib
+import os
 
 
 if __name__ == "__main__":
@@ -33,6 +34,7 @@ if __name__ == "__main__":
     RTPPORT = root.find('rtpaudio').attrib['port']
     PROXYIP = root.find('regproxy').attrib['ip']
     PROXYPORT = root.find('regproxy').attrib['port']
+    SONG = root.find('audio').attrib['path']
 
     if METHOD == 'REGISTER':
         receiver = root.find('regproxy').attrib['ip']
@@ -87,12 +89,17 @@ audio ' + RTPPORT + ' RTP\r\n'
  ="' + bytes(str(m1),'utf-8') + b'"' )
 
         elif info.startswith('SIP/2.0 100 Trying'):
+            a = info.split(' ')
+            RTPPORTrecv2 = a[8]
+            b = a[7].split('\r\n')
+            RTPIPrecv2 = b[0]
+
             my_socket.send(bytes(ACKLINE,'utf-8'))
             print('MANDO AAAAACKKKKKKKKKKKKKKKKK')
             print(SONG)
-            print('VAMOS A MANDAR CANCIÓN A: ' + RTPIPrecv + ' ' + str(RTPPORTrecv))
+            print('VAMOS A MANDAR CANCIÓN A: ' + RTPIPrecv2 + ' ' + str(RTPPORTrecv2))
             # aEjecutar es un string con lo que se ha de ejecutar en la shell
-            aEjecutar = './mp32rtp -i ' + RTPIPrecv + ' -p ' + str(RTPPORTrecv) + ' < ' + SONG
+            aEjecutar = './mp32rtp -i ' + RTPIPrecv2 + ' -p ' + str(RTPPORTrecv2) + ' < ' + SONG
             print('Vamos a ejecutar', aEjecutar)
             os.system(aEjecutar)
             print('EJECUTADO!')
