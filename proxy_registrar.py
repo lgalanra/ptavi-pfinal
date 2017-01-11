@@ -24,7 +24,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     users = []
     direction = ''
     nonce = ''
-    receiver = ''
+    recvIP = ''
+    recvPORT = 0
 
     for i in range (10):
         nonce += str(random.randint(0,9))
@@ -90,10 +91,10 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         elif info.startswith('INVITE'):
             a = info.split(':')
             b = a[1].split(' ')
-            self.receiver = b[0]
+            receiver = b[0]
             found = False
             for dicc in self.users:
-                if self.receiver == dicc['address']:
+                if receiver == dicc['address']:
                     found = True
                     self.recvIP = dicc['ip']
                     self.recvPORT = dicc['port']
@@ -118,11 +119,25 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
         elif info.startswith('ACK'):
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+                a = info.split(':')
+                b = a[1].split(' ')
+                receiver = b[0]
+                for dicc in self.users:
+                    if receiver == dicc['address']:
+                        self.recvIP = dicc['ip']
+                        self.recvPORT = dicc['port']
+                print(self.recvIP, self.recvPORT)
                 my_socket.connect((self.recvIP, int(self.recvPORT)))
 
                 print('ENVIANDO: ' + info)
                 my_socket.send(bytes(info, 'utf-8'))
-
+        elif info.startswith('BYE'):
+            with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
+                a = info.split(':')
+                b = a[1].split(' ')
+                receiver = b[0]
+                for dicc in self.users:
+                    pass
 
 
         else:
