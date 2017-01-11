@@ -24,8 +24,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     users = []
     direction = ''
     nonce = ''
-    recvIP = ''
-    recvPORT = 0
 
     for i in range (10):
         nonce += str(random.randint(0,9))
@@ -41,7 +39,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         text = self.rfile.read()
         info = text.decode('utf-8')
         print('Recibimos -> ' + info)
-
+        self.checkuser_ondate()
 
         if info.find('Authorization') != -1:
             print('VAMOS A COMPROBAAAAAAAAR ')
@@ -65,8 +63,6 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             e1 = e[0].split(' ')
             self.expire = e1[1]
 
-
-
             print(self.user + 'UEEEEEEEEEEEEEEEEEEE')
             FILE = open('passwords.txt')
             for line in FILE:
@@ -89,6 +85,9 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
             self.register2json()
         elif info.startswith('INVITE'):
+
+            self.json2registered()
+
             a = info.split(':')
             b = a[1].split(' ')
             receiver = b[0]
@@ -96,11 +95,13 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
             for dicc in self.users:
                 if receiver == dicc['address']:
                     found = True
-                    self.recvIP = dicc['ip']
-                    self.recvPORT = dicc['port']
+                    global recvIP
+                    global recvPORT
+                    recvIP = dicc['ip']
+                    recvPORT = dicc['port']
                     print('ENCONTRADOOOOOOOOOOOOOO')
                     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
-                            my_socket.connect((self.recvIP, int(self.recvPORT)))
+                            my_socket.connect((recvIP, int(recvPORT)))
 
                             print('ENVIANDO: ' + info)
                             my_socket.send(bytes(info, 'utf-8'))
@@ -115,7 +116,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                                 self.wfile.write(bytes(info,'utf-8'))
 
             if not found:
-                self.wfile.write(b'SIP/2.0 404 User Not Found')
+                self.wfile.write(b'SIP/2.0 404 User Not Found\r\n\r\n')
 
         elif info.startswith('ACK'):
             with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as my_socket:
@@ -124,10 +125,12 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 receiver = b[0]
                 for dicc in self.users:
                     if receiver == dicc['address']:
-                        self.recvIP = dicc['ip']
-                        self.recvPORT = dicc['port']
-                print(self.recvIP, self.recvPORT)
-                my_socket.connect((self.recvIP, int(self.recvPORT)))
+                        recvIP = dicc['ip']
+                        recvPORT = dicc['port']
+
+                my_socket.connect((recvIP, int(recvPORT)))
+
+                print(recvIP,recvPORT)
 
                 print('ENVIANDO: ' + info)
                 my_socket.send(bytes(info, 'utf-8'))
@@ -139,10 +142,10 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
                 receiver = b[0]
                 for dicc in self.users:
                     if receiver == dicc['address']:
-                        self.recvIP = dicc['ip']
-                        self.recvPORT = dicc['port']
-                print(self.recvIP, self.recvPORT)
-                my_socket.connect((self.recvIP, int(self.recvPORT)))
+                        recvIP = dicc['ip']
+                        recvPORT = dicc['port']
+                print(recvIP, recvPORT)
+                my_socket.connect((recvIP, int(recvPORT)))
                 print('ENVIANDO ' + info)
                 my_socket.send(bytes(info,'utf-8'))
 
@@ -157,7 +160,7 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
 
         else:
             print(self.nonce)
-            self.wfile.write(b'SIP/2.0 401 Unauthorized\r\nWWW Authenticate: \
+            self.wfile.write(b'SIP/2.0 401 Unauthorized\r\n\r\nWWW Authenticate: \
 Digest nonce=' + bytes(self.nonce,'utf-8'))
 
     def register2json(self):
@@ -176,6 +179,8 @@ Digest nonce=' + bytes(self.nonce,'utf-8'))
 
         self.users.append(auxdicc)
 #        exptime = time.strftime('%Y-%m-%d %H:%M:%S',time.gmtime(int(self.expire) + time.time()))
+
+        self.checkuser_ondate()
 
         json.dump(self.users, open("registered.json", 'w'),
                   sort_keys=True, indent=4, separators=(',', ': '))
@@ -197,6 +202,10 @@ Digest nonce=' + bytes(self.nonce,'utf-8'))
             pass
 
 if __name__ == "__main__":
+
+    recvIP = ''
+    recvPORT = 0
+
     try:
         CONFIG = sys.argv[1]
         tree = ET.parse(CONFIG)
