@@ -24,8 +24,8 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
     users = []
     direction = ''
     nonce = ''
-    recvIP = ''
-    recvPORT = ''
+    receiver = ''
+
     for i in range (10):
         nonce += str(random.randint(0,9))
 
@@ -90,10 +90,10 @@ class SIPRegisterHandler(socketserver.DatagramRequestHandler):
         elif info.startswith('INVITE'):
             a = info.split(':')
             b = a[1].split(' ')
-            receiver = b[0]
+            self.receiver = b[0]
             found = False
             for dicc in self.users:
-                if receiver == dicc['address']:
+                if self.receiver == dicc['address']:
                     found = True
                     self.recvIP = dicc['ip']
                     self.recvPORT = dicc['port']
