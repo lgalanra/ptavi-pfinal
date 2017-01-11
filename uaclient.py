@@ -89,6 +89,15 @@ audio ' + RTPPORT + ' RTP\r\n'
         elif info.startswith('SIP/2.0 100 Trying'):
             my_socket.send(bytes(ACKLINE,'utf-8'))
             print('MANDO AAAAACKKKKKKKKKKKKKKKKK')
+            print(SONG)
+            print('VAMOS A MANDAR CANCIÓN A: ' + RTPIPrecv + ' ' + str(RTPPORTrecv))
+            # aEjecutar es un string con lo que se ha de ejecutar en la shell
+            aEjecutar = './mp32rtp -i ' + RTPIPrecv + ' -p ' + str(RTPPORTrecv) + ' < ' + SONG
+            print('Vamos a ejecutar', aEjecutar)
+            os.system(aEjecutar)
+            print('EJECUTADO!')
+
+
         elif info.startswith('SIP/2.0 200 OK'):
             print('SE ACABÓOOOOOOOOOOOOOOOOOO')
         else:
